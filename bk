@@ -8,6 +8,10 @@ on:
             description: "Postman collection ID to run"
             type: string
             required: true 
+        postman_env_id:
+                description: "Postman env ID"
+                type: string
+                required: false
 
         vault-jwt-role-name:
             description: |
@@ -38,19 +42,55 @@ on:
                     secret/data/ci writer_user_token | DOCKER_WRITER_USER_TOKEN ;
             required: true
             type: string
+    secrets:
+        vault-role-id:
+            description: |
+                the vault-role-id can be retrieve with the vault module editor
+                the link to the documentation : https://jira.adeo.com/confluence/display/SOFA/HowTo+-+Create+-+Update+a+module
+                required: false
+    
+        vault-secret-id:
+            description: |
+                the vault-role-id can be retrieve with the vault module editor
+                the link to the documentation : https://jira.adeo.com/confluence/display/SOFA/HowTo+-+Create+-+Update+a+module
+                required: false
 
 jobs:
     run_postman_collection:
         runs-on: ubuntu-latest
         steps:
-            - name : Print collection_id
-              run: echo "collection_id = ${{inputs.collection_id}}"
-            
-            - name: 🔐 Import secrets from Vault
-              uses: adeo/vault-action@v1.2.2
+            #- name: 🔐 Import secrets from Vault
+            #  uses: adeo/vault-action@v1.2.2
+            #   with:
+            #     vault-namespace: ${{ inputs.vault-namespace }}
+            #     vault-jwt-role-name: ${{ inputs.vault-jwt-role-name}}
+            #     vault-role-id: ${{ secrets.vault-role-id }}
+            #     vault-secret-id: ${{ secrets.vault-secret-id }}
+            #     vault-secrets: ${{ inputs.vault-secrets }}
+            - name: Import secrets from Vault
+              id: secrets
+              uses: hashicorp/vault-action@v2.3.0
               with:
-                vault-namespace: ${{ inputs.vault-namespace }}
-                vault-jwt-role-name: ${{ inputs.vault-jwt-role-name}}
-                vault-role-id: ${{ secrets.vault-role-id }}
-                vault-secret-id: ${{ secrets.vault-secret-id }}
-                vault-secrets: ${{ inputs.vault-secrets }}
+                 url: https://vault.factory.adeo.cloud
+                 namespace: ${{ inputs.vault-namespace }}
+                 method: jwt
+                 path: adeo_github_actions
+                 jwtGithubAudience: https://github.com/adeo
+                 role: ${{ inputs.vault-jwt-role-name}}
+                 secrets: ${{ inputs.vault-secrets }}
+
+            - name : Print collection_id
+              run: |
+                echo "collection_id = ${{inputs.collection_id}}"
+            - uses: actions/checkout@v3
+            - name: Install Postman CLI
+              run: |
+                curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
+
+            - name: Login to Postman CLI
+              run: postman login --with-api-key ${{ env.POSTMAN_API_KEY }}
+
+            - name: Run API tests
+              run: |
+                postman collection run ${{inputs.collection_id}} -e ${{inputs.postman_env_id}}
+            

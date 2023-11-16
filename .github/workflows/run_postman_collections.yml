@@ -59,14 +59,6 @@ jobs:
     run_postman_collection:
         runs-on: ubuntu-latest
         steps:
-            #- name: 🔐 Import secrets from Vault
-            #  uses: adeo/vault-action@v1.2.2
-            #   with:
-            #     vault-namespace: ${{ inputs.vault-namespace }}
-            #     vault-jwt-role-name: ${{ inputs.vault-jwt-role-name}}
-            #     vault-role-id: ${{ secrets.vault-role-id }}
-            #     vault-secret-id: ${{ secrets.vault-secret-id }}
-            #     vault-secrets: ${{ inputs.vault-secrets }}
             - name: Import secrets from Vault
               id: secrets
               uses: hashicorp/vault-action@v2.3.0
