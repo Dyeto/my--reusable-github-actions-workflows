@@ -1,5 +1,8 @@
 name: "Run postman collection"
-permissions: write-all
+
+permissions: 
+    contents: read
+    id-token: write
 
 on:
   workflow_call:
