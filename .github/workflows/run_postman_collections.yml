@@ -1,0 +1,17 @@
+name: "Run postman collection"
+permissions: write-all
+
+on:
+  workflow_call:
+    inputs:
+        collection_id:
+            description: "Postman collection ID to run"
+            type: string
+            required: true 
+
+jobs:
+    run_postman_collection:
+        runs-on: ubuntu_latest
+        steps:
+            - name : Print collection_id
+              run: echo "collection_id = ${{inputs.collection_id}}"
