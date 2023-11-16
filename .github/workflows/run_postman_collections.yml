@@ -15,6 +15,10 @@ on:
                 description: "Postman env ID"
                 type: string
                 required: false
+        postman_api_key:
+                description: "Postman env ID"
+                type: string
+                required: true
 
         vault-jwt-role-name:
             description: |
@@ -62,28 +66,25 @@ jobs:
     run_postman_collection:
         runs-on: ubuntu-latest
         steps:
-            - name: Import secrets from Vault
-              id: secrets
-              uses: hashicorp/vault-action@v2.3.0
-              with:
-                 url: https://vault.factory.adeo.cloud
-                 namespace: ${{ inputs.vault-namespace }}
-                 method: jwt
-                 path: adeo_github_actions
-                 jwtGithubAudience: https://github.com/adeo
-                 role: ${{ inputs.vault-jwt-role-name}}
-                 secrets: ${{ inputs.vault-secrets }}
+            # - name: Import secrets from Vault
+            #   id: secrets
+            #   uses: hashicorp/vault-action@v2.3.0
+            #   with:
+            #      url: https://vault.factory.adeo.cloud
+            #      namespace: ${{ inputs.vault-namespace }}
+            #      method: jwt
+            #      path: adeo_github_actions
+            #      jwtGithubAudience: https://github.com/adeo
+            #      role: ${{ inputs.vault-jwt-role-name}}
+            #      secrets: ${{ inputs.vault-secrets }}
 
-            - name : Print collection_id
-              run: |
-                echo "collection_id = ${{inputs.collection_id}}"
             - uses: actions/checkout@v3
             - name: Install Postman CLI
               run: |
                 curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
 
             - name: Login to Postman CLI
-              run: postman login --with-api-key ${{ env.POSTMAN_API_KEY }}
+              run: postman login --with-api-key ${{ inputs.postman_api_key }}
 
             - name: Run API tests
               run: |
