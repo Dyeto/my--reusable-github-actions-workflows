@@ -9,9 +9,48 @@ on:
             type: string
             required: true 
 
+        vault-jwt-role-name:
+            description: |
+                The name of the role allowed to use authentication with github provided JWT
+                For this to be working, you have to change rights on the GITHUB_TOKEN \
+                https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/
+                configuring-openid-connect-in-hashicorp-vault#adding-permissions-settings
+            required: false
+            type: string
+        
+        vault-namespace:
+            description: |
+                if you don't have a vault namespace, you can create one with this spootnik form:
+                https://spootnik.adeo.cloud/all/new-namespace
+            required: true
+            type: string
+        
+        vault-secrets:
+            description: |
+                add all your secrets to import from Vault here
+                You have to precise the path in vault of :
+                * your artifactory auth token (NODE_AUTH_TOKEN)
+                * your artifactory user token (DOCKER_WRITER_USER_TOKEN)
+                example:
+                vault-secrets: |
+                    secret/data/ci writer_auth_token | NODE_AUTH_TOKEN ;
+                    secret/data/ci writer_user_name | DOCKER_WRITER_USER_NAME ;
+                    secret/data/ci writer_user_token | DOCKER_WRITER_USER_TOKEN ;
+            required: true
+            type: string
+
 jobs:
     run_postman_collection:
-        runs-on: ubuntu_latest
+        runs-on: ubuntu-latest
         steps:
             - name : Print collection_id
               run: echo "collection_id = ${{inputs.collection_id}}"
+            
+            - name: 🔐 Import secrets from Vault
+              uses: adeo/vault-action@v1.2.2
+              with:
+                vault-namespace: ${{ inputs.vault-namespace }}
+                vault-jwt-role-name: ${{ inputs.vault-jwt-role-name}}
+                vault-role-id: ${{ secrets.vault-role-id }}
+                vault-secret-id: ${{ secrets.vault-secret-id }}
+                vault-secrets: ${{ inputs.vault-secrets }}
