@@ -8,15 +8,28 @@ on:
             description: "Postman collection ID to run"
             type: string
             required: true 
+
         postman_env_id:
-                description: "Postman env ID"
-                type: string
-                required: false
+            description: "Postman env ID"
+            type: string
+            required: false
+
+        jira_project_key:
+            description: "Jira project key name: ex: CIAM"
+            type: string
+            required: true
                 
     secrets:
         postman_api_key:
             description: "Postman env ID"
             required: true
+
+        jira_username:
+          required: true
+
+        jira_password:
+          required: true
+        
 
                 
 jobs:
@@ -43,5 +56,12 @@ jobs:
               with:
                 filePath: ./report.xml
                 pr_number: 1
-            
+
+            - name: Submit results to Xray
+              env:
+                JIRA_PROJECT_KEY: ${{inputs.jira_project_key}}
+                JIRA_USERNAME: ${{ secrets.jira_username }}
+                JIRA_PASSWORD: ${{ secrets.jira_password }}
+              run: 'curl -H "Content-Type: multipart/form-data" -u $JIRA_USERNAME:$JIRA_PASSWORD -F "file=@report.xml" "https://jira.adeo.com/rest/raven/1.0/import/execution/junit?projectKey=$JIRA_PROJECT_KEY"'
+        
             
