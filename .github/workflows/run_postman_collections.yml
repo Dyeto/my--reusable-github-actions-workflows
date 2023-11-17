@@ -23,22 +23,17 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
-            - name: Install Postman CLI
-              run: |
-                curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
-
-            - name: Login to Postman CLI
-              run: postman login --with-api-key ${{ secrets.postman_api_key }}
-
-            - name: Run API tests
-              id: run-test
-              run: |
-                postman collection run ${{inputs.collection_id}} -e ${{inputs.postman_env_id}} > report.txt
-
+            
+            - uses: actions/setup-node@v4
+              with:
+                node-version: 18
+            - run: npm install -g newman
+            - run: newman run "https://api.postman.com/collections/${{inputs.collection_id}}?apikey=${{ secrets.postman_api_key }}"  --environment "https://api.getpostman.com/environments/${{inputs.postman_env_id}}?apikey=${{ secrets.postman_api_key }}" -r junit --reporter-junit-export report.xml
+            
             - name: Comment with the result
               uses: thollander/actions-comment-pull-request@v2
               with:
-                filePath: ./report.txt
+                filePath: ./report.xml
                 pr_number: 1
             
             
