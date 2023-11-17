@@ -30,6 +30,13 @@ jobs:
               run: postman login --with-api-key ${{ secrets.postman_api_key }}
 
             - name: Run API tests
+              id: run-test
               run: |
-                postman collection run ${{inputs.collection_id}} -e ${{inputs.postman_env_id}}
+                postman collection run ${{inputs.collection_id}} -e ${{inputs.postman_env_id}} > report.txt
+
+            - name: Comment with the result
+              uses: thollander/actions-comment-pull-request@v2
+              with:
+                filePath: ./report.txt
+            
             
