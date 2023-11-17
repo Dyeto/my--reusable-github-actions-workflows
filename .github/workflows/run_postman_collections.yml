@@ -18,73 +18,19 @@ on:
         postman_api_key:
                 description: "Postman env ID"
                 type: string
-                required: true
-
-        vault-jwt-role-name:
-            description: |
-                The name of the role allowed to use authentication with github provided JWT
-                For this to be working, you have to change rights on the GITHUB_TOKEN \
-                https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/
-                configuring-openid-connect-in-hashicorp-vault#adding-permissions-settings
-            required: false
-            type: string
-        
-        vault-namespace:
-            description: |
-                if you don't have a vault namespace, you can create one with this spootnik form:
-                https://spootnik.adeo.cloud/all/new-namespace
-            required: true
-            type: string
-        
-        vault-secrets:
-            description: |
-                add all your secrets to import from Vault here
-                You have to precise the path in vault of :
-                * your artifactory auth token (NODE_AUTH_TOKEN)
-                * your artifactory user token (DOCKER_WRITER_USER_TOKEN)
-                example:
-                vault-secrets: |
-                    secret/data/ci writer_auth_token | NODE_AUTH_TOKEN ;
-                    secret/data/ci writer_user_name | DOCKER_WRITER_USER_NAME ;
-                    secret/data/ci writer_user_token | DOCKER_WRITER_USER_TOKEN ;
-            required: true
-            type: string
-    secrets:
-        vault-role-id:
-            description: |
-                the vault-role-id can be retrieve with the vault module editor
-                the link to the documentation : https://jira.adeo.com/confluence/display/SOFA/HowTo+-+Create+-+Update+a+module
                 required: false
-    
-        vault-secret-id:
-            description: |
-                the vault-role-id can be retrieve with the vault module editor
-                the link to the documentation : https://jira.adeo.com/confluence/display/SOFA/HowTo+-+Create+-+Update+a+module
-                required: false
-
+                
 jobs:
     run_postman_collection:
         runs-on: ubuntu-latest
         steps:
-            # - name: Import secrets from Vault
-            #   id: secrets
-            #   uses: hashicorp/vault-action@v2.3.0
-            #   with:
-            #      url: https://vault.factory.adeo.cloud
-            #      namespace: ${{ inputs.vault-namespace }}
-            #      method: jwt
-            #      path: adeo_github_actions
-            #      jwtGithubAudience: https://github.com/adeo
-            #      role: ${{ inputs.vault-jwt-role-name}}
-            #      secrets: ${{ inputs.vault-secrets }}
-
             - uses: actions/checkout@v3
             - name: Install Postman CLI
               run: |
                 curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
 
             - name: Login to Postman CLI
-              run: postman login --with-api-key ${{ inputs.postman_api_key }}
+              run: postman login --with-api-key ${{ env.POSTMAN_API_KEY }}
 
             - name: Run API tests
               run: |
