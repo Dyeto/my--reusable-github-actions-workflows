@@ -11,10 +11,11 @@ on:
                 description: "Postman env ID"
                 type: string
                 required: false
+    secrets:
         postman_api_key:
-                description: "Postman env ID"
-                type: string
-                required: false
+            description: "Postman env ID"
+            required: false
+
                 
 jobs:
     run_postman_collection:
@@ -26,7 +27,7 @@ jobs:
                 curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
 
             - name: Login to Postman CLI
-              run: postman login --with-api-key ${{ inputs.postman_api_key }}
+              run: postman login --with-api-key ${{ secrets.postman_api_key }}
 
             - name: Run API tests
               run: |
