@@ -12,7 +12,7 @@ on:
                 description: "Postman env ID"
                 type: string
                 required: false
-                default: "none"
+                
     secrets:
         postman_api_key:
             description: "Postman env ID"
@@ -32,11 +32,11 @@ jobs:
 
             - name: Run without env
               run: newman run "https://api.postman.com/collections/${{inputs.collection_id}}?apikey=${{ secrets.postman_api_key }}" -r junit --reporter-junit-export report.xml
-              if: ${{ github.event.inputs.postman_env_id == 'none' }}
+              if: ${{ inputs.postman_env_id == null }}
 
             - name: Run with env
               run: newman run "https://api.postman.com/collections/${{inputs.collection_id}}?apikey=${{ secrets.postman_api_key }}"  --environment "https://api.getpostman.com/environments/${{inputs.postman_env_id}}?apikey=${{ secrets.postman_api_key }}" -r junit --reporter-junit-export report.xml
-              if: ${{ github.event.inputs.postman_env_id != 'none' }}
+              if: ${{ inputs.postman_env_id != null }}
             
             - name: Comment with the result
               uses: thollander/actions-comment-pull-request@v2
@@ -45,4 +45,3 @@ jobs:
                 pr_number: 1
             
             
-                
