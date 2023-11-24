@@ -8,7 +8,7 @@ on:
 
 jobs:
     run_echo_test:
-        runs-on: ubuntu-lates
+        runs-on: ubuntu-latest
         steps:
             - name: test1 
               run: echo ${{inputs.names}}
