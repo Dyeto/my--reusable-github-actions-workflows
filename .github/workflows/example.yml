@@ -3,7 +3,7 @@ name: Use test
 on: push
 jobs:
     run-est:
-        uses: ./github/workflows/test.yml@main
+        uses: .github/workflows/test.yml@main
         with:
          names: |
             name1
