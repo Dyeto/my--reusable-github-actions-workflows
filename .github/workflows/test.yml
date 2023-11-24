@@ -12,7 +12,7 @@ jobs:
         steps:
             - name: test1 
               run: |
-                 for name in ${{inputs.names}};do echo "jjjj=$name";done
+                 for name in "${{inputs.names}}";do echo "jjjj=$name";done
                  echo Done
 
               
