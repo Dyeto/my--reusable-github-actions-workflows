@@ -11,4 +11,8 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: test1 
-              run: echo "${{inputs.names}}"
+              run: |
+                 for name in ${{inputs.names}};do echo "jjjj=$name";done
+                 echo Done
+
+              
