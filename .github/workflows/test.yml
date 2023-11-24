@@ -1,0 +1,14 @@
+name: Tes test
+on:
+    workflow_call:
+        inputs:
+            names:
+                type: string
+                required: true 
+
+jobs:
+    run_echo_test:
+        runs-on: ubuntu-lates
+        steps:
+            - name: test1 
+              run: echo ${{inputs.names}}

@@ -1,0 +1,10 @@
+name: Use test
+
+on: push
+jobs:
+    run-est:
+        uses: ./github/workflows/test.yml
+        with:
+         names: |
+            name1
+            nnnnn

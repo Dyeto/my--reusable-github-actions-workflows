@@ -10,7 +10,7 @@ on:
             required: true 
 
         postman_env_id:
-            description: "Postman env ID"
+            description: "Postman env ID, not required"
             type: string
             required: false
 
